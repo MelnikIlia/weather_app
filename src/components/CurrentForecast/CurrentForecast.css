@@ -1,0 +1,42 @@
+.current-forecast {
+  color: #fff;
+  text-align: center;
+  justify-content: center;
+  transition: all 1s ease-in;
+}
+
+.current-forecast > div:last-child {
+  border-left: 2px dashed #fff;
+  padding: 0em 2rem;
+}
+
+.condition-text {
+  font-size: 22px;
+}
+
+.condition-text::first-letter {
+  text-transform: uppercase;
+}
+
+.date-text::first-letter {
+  text-transform: uppercase;
+}
+
+.current-forecast-details {
+  text-align: left;
+  font-size: 22px;
+  padding: 10px;
+}
+
+.sun-schedule {
+  width: min-content;
+  display: inline-block;
+  margin: 0 10px;
+}
+
+@media screen and (max-width: 992px) {
+  .current-forecast > div:last-child {
+    border-top: 2px dashed #fff;
+    border-left: none;
+  }
+}

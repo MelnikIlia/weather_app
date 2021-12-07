@@ -1,0 +1,1 @@
+export const MIN_AMOUNT_CHARS_TO_SEARCH = 4
