@@ -13,10 +13,10 @@ function App() {
   const { getForecast } = useForecast()
 
   useEffect(() => {
-    const { location } = JSON.parse(localStorage.getItem('serviceData')) || {}
-    const { forecast } = JSON.parse(localStorage.getItem('forecastData')) || {}
-    const isLocation = Object.keys(location).length > 0
-    const isForecast = Object.keys(forecast).length > 0
+    const { location } = JSON.parse(localStorage.getItem('serviceData')) || false
+    const { forecast } = JSON.parse(localStorage.getItem('forecastData')) || false
+    const isLocation = location && Object.keys(location).length > 0
+    const isForecast = forecast && Object.keys(forecast).length > 0
     const hourInterval = 60 * (60 * 1000)
 
     if (isForecast) setForecast(forecast)
