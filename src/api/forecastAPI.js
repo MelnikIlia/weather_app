@@ -6,57 +6,59 @@ const BASE_URL = 'https://api.openweathermap.org/data/2.5/'
 const SPOTT_URL = 'https://spott.p.rapidapi.com/'
 
 async function autocompleteName(cityName) {
-  const res = await axios.get(`${SPOTT_URL}places/autocomplete`, {
-    params: {
-      type: 'CITY',
-      q: cityName,
-      skip: 0,
-      limit: 7
-    },
-    headers: {
-      'x-rapidapi-host': 'spott.p.rapidapi.com',
-      'x-rapidapi-key': `${SPOTT_API_KEY}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  return res.data
+  return await axios
+    .get(`${SPOTT_URL}places/autocomplete`, {
+      params: {
+        type: 'CITY',
+        q: cityName,
+        skip: 0,
+        limit: 7
+      },
+      headers: {
+        'x-rapidapi-host': 'spott.p.rapidapi.com',
+        'x-rapidapi-key': `${SPOTT_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((res) => res.data)
+    .catch((err) => { if (err.response) return err })
 }
 
 async function fetchCoordinates(cityName) {
-  const res = await axios.get(`${SPOTT_URL}places`, {
-    params: {
-      type: 'CITY',
-      q: cityName,
-      skip: 0,
-      limit: 1
-    },
-    headers: {
-      'x-rapidapi-host': 'spott.p.rapidapi.com',
-      'x-rapidapi-key': `${SPOTT_API_KEY}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  return res.data
+  return await axios
+    .get(`${SPOTT_URL}places`, {
+      params: {
+        type: 'CITY',
+        q: cityName,
+        skip: 0,
+        limit: 1
+      },
+      headers: {
+        'x-rapidapi-host': 'spott.p.rapidapi.com',
+        'x-rapidapi-key': `${SPOTT_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((res) => res.data)
+    .catch((err) => { if (err.response) return err })
 }
 
 async function fetchForecast(coordinates) {
-  const res = await axios.get(`${BASE_URL}onecall`, {
-    params: {
-      appid: `${WEATHER_API_KEY}`,
-      lat: coordinates.latitude,
-      lon: coordinates.longitude,
-      exclude: 'minutely,hourly',
-      units: 'metric'
-    },
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  return res.data
+  return await axios
+    .get(`${BASE_URL}onecall`, {
+      params: {
+        appid: `${WEATHER_API_KEY}`,
+        lat: coordinates.latitude,
+        lon: coordinates.longitude,
+        exclude: 'minutely,hourly',
+        units: 'metric'
+      },
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((res) => res.data)
+    .catch((err) => { if (err.response) return err })
 }
 
-export {
-  fetchForecast,
-  fetchCoordinates,
-  autocompleteName
-}
+export { fetchForecast, fetchCoordinates, autocompleteName }

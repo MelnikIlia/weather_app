@@ -22,16 +22,21 @@ const SearchCityContainer = () => {
     if (cityName.length === 0) setSuggestions([])
 
     if (cityName.length > 0) {
-      validInput(cityName) ? setError(false) : setError('The name of the place must contain only letters and be longer than 3')
+      validInput(cityName)
+        ? setError(false)
+        : setError('The name of the place must contain only letters and be longer than 3')
     }
 
     if (cityName.length === MIN_AMOUNT_CHARS_TO_SEARCH) {
       autocompleteName(cityName).then((res) => {
-        setSuggestions(
-          [...res].map((suggestion) => ({
-            name: `${suggestion.name}, ${suggestion.country.name}`
-          }))
-        )
+        if (res.status === 504) setError('Server response time expired. Try again later')
+        else {
+          setSuggestions(
+            [...res].map((suggestion) => ({
+              name: `${suggestion.name}, ${suggestion.country.name}`
+            }))
+          )
+        }
       })
     }
   }, [cityName])

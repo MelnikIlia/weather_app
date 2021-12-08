@@ -9,7 +9,7 @@ import './App.css'
 
 function App() {
   const isPageVisible = usePageVisibility()
-  const { setForecast } = useContext(AppContext)
+  const { setForecast, setError } = useContext(AppContext)
 
   useEffect(() => {
     const { lat, lon } = JSON.parse(localStorage?.getItem('serviceData')) || {}
@@ -20,7 +20,16 @@ function App() {
     if (isForecast) setForecast(forecast)
 
     setTimeout(function updateForecast() {
-      if (isPageVisible) { fetchForecast({ latitude: lat, longitude: lon }).then((res) => setForecast({ name: forecast.name, ...res })) }
+      if (isPageVisible) {
+        fetchForecast({ latitude: lat, longitude: lon }).then((res) => {
+          if (res.status === 504) {
+            setError('Server response time expired. Try again later')
+          } else {
+            setForecast({ name: forecast.name, ...res })
+          }
+        })
+      }
+
       setTimeout(updateForecast, hourInterval)
     }, hourInterval)
   }, [])
