@@ -1,38 +1,39 @@
 import React, { useContext, useEffect } from 'react'
 import { usePageVisibility } from 'react-page-visibility'
 import { AppContext } from './AppContext'
-import { fetchForecast } from './api/forecastAPI'
 
 import Page from './components/Page/Page'
 
 import './App.css'
+import { useForecast } from './hooks/useForecast'
 
 function App() {
   const isPageVisible = usePageVisibility()
-  const { setForecast, setError } = useContext(AppContext)
+  const { location, setForecast } = useContext(AppContext)
+  const { getForecast } = useForecast()
 
   useEffect(() => {
-    const { lat, lon } = JSON.parse(localStorage?.getItem('serviceData')) || {}
-    const { forecast } = JSON.parse(localStorage?.getItem('forecastData')) || {}
+    const { location } = JSON.parse(localStorage.getItem('serviceData')) || {}
+    const { forecast } = JSON.parse(localStorage.getItem('forecastData')) || {}
+    const isLocation = Object.keys(location).length > 0
     const isForecast = Object.keys(forecast).length > 0
     const hourInterval = 60 * (60 * 1000)
 
     if (isForecast) setForecast(forecast)
 
     setTimeout(function updateForecast() {
-      if (isPageVisible) {
-        fetchForecast({ latitude: lat, longitude: lon }).then((res) => {
-          if (res.status === 504) {
-            setError('Server response time expired. Try again later')
-          } else {
-            setForecast({ name: forecast.name, ...res })
-          }
-        })
+      if (isPageVisible && isLocation) {
+        getForecast(location)
       }
 
       setTimeout(updateForecast, hourInterval)
     }, hourInterval)
   }, [])
+
+  useEffect(() => {
+    const isLocation = Object.keys(location).length > 0
+    isLocation && getForecast(location)
+  }, [location])
 
   return (
     <div className="App">

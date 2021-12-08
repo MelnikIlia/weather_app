@@ -5,6 +5,7 @@ export const AppContext = createContext([{}, () => {}])
 
 export const AppProvider = (props) => {
   const [forecast, setForecast] = useState({})
+  const [location, setLocation] = useState({})
   const [isLoading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
@@ -18,14 +19,13 @@ export const AppProvider = (props) => {
     localStorage.setItem(
       'serviceData',
       JSON.stringify({
-        lat: forecast.lat,
-        lon: forecast.lon
+        location: location
       })
     )
   }, [forecast])
 
   return (
-    <AppContext.Provider value={{ forecast, setForecast, isLoading, setLoading, error, setError }}>
+    <AppContext.Provider value={{ forecast, setForecast, location, setLocation, isLoading, setLoading, error, setError }}>
       {props.children}
     </AppContext.Provider>
   )
