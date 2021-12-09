@@ -28,16 +28,23 @@ const SearchCityContainer = () => {
     }
 
     if (cityName.length === MIN_AMOUNT_CHARS_TO_SEARCH) {
-      autocompleteName(cityName).then((res) => {
-        if (res.status === 504) setError('Server response time expired. Try again later')
-        else {
-          setSuggestions(
-            [...res].map((suggestion) => ({
-              name: `${suggestion.name}, ${suggestion.country.name}`
-            }))
-          )
+      (async () => {
+        try {
+          const res = await autocompleteName(cityName)
+
+          if (res.status === 200) {
+            setSuggestions(
+              [...res.data].map((suggestion) => ({
+                name: `${suggestion.name}, ${suggestion.country.name}`
+              }))
+            )
+          } else {
+            throw Error(res)
+          }
+        } catch (err) {
+          if (err.status === 504) setError('Server response time expired. Try again later')
         }
-      })
+      })()
     }
   }, [cityName])
 

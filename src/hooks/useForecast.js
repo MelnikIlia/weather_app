@@ -6,33 +6,49 @@ function useForecast() {
   const { setForecast, setLocation, setLoading, setError } = useContext(AppContext)
 
   function getCoordinates(location) {
-    fetchCoordinates(location).then((res) => {
-      if (res.length === 0) {
-        setError("Can't find weather forecast for this location")
-      } else if (res.status === 504) {
-        setError('Server response time expired. Try again later')
-      } else {
-        const coordinates = res[0].coordinates
-        const name = `${res[0].name}, ${res[0].country.name}`
+    (async () => {
+      try {
+        const res = await fetchCoordinates(location)
 
-        setLocation({ coordinates, name })
+        if (res.status === 200) {
+          const coordinates = res.data[0].coordinates
+          const name = `${res.data[0].name}, ${res.data[0].country.name}`
+
+          if (res.data.length === 0) {
+            throw Error("Can't find this location")
+          } else {
+            setLocation({ coordinates, name })
+          }
+        } else {
+          throw Error(res)
+        }
+      } catch (err) {
+        if (err.status === 504) {
+          setError('Server response time expired. Try again later')
+        }
       }
-    })
+    })()
   }
 
   function getForecast({ coordinates, name }) {
-    setForecast({})
-    setLoading(true)
+    (async () => {
+      setForecast({})
+      setLoading(true)
 
-    fetchForecast(coordinates).then((res) => {
-      if (res.status === 504) {
-        setError('Server response time expired. Try again later')
-      } else {
-        res.name = name
-        setForecast(res)
-        setLoading(false)
+      try {
+        const res = await fetchForecast(coordinates)
+
+        if (res.status === 200) {
+          res.data.name = name
+          setForecast(res.data)
+          setLoading(false)
+        } else {
+          throw Error(res)
+        }
+      } catch (err) {
+        if (err.status === 504) setError('Server response time expired. Try again later')
       }
-    })
+    })()
   }
 
   return { getCoordinates, getForecast }
