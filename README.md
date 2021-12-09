@@ -12,7 +12,7 @@ I created this little project to learn about project planning and development.
 
 ```sh
 git clone https://github.com/MelnikIlia/weather_app
-cd weather-app
+cd weather_app
 npm install
 npm start
 ```
