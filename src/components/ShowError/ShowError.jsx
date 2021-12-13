@@ -1,18 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import './Error.css'
+import './ShowError.css'
 
-const Error = ({ error }) => {
+const ShowError = ({ error }) => {
   return (
     <div className="text-center animate__animated animate__fadeIn">
-      <span className="error">{error}</span>
+      <span className="show-error">{error}</span>
     </div>
   )
 }
 
-Error.propTypes = {
+ShowError.propTypes = {
   error: PropTypes.string.isRequired
 }
 
-export default Error
+export default ShowError
