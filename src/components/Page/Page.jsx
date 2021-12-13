@@ -1,6 +1,6 @@
 import React, { Suspense, useContext } from 'react'
 import { AppContext } from '../../AppContext'
-import { isObjectEmpty } from '../../helpers/helpers'
+import { isObjectEmpty } from '../../lib/checkFunctions'
 
 import SearchCityContainer from '../../containers/SearchCityContainer'
 import Loader from '../../components/Loader/Loader'

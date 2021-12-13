@@ -1,22 +1,27 @@
 import { useContext } from 'react'
 import { AppContext } from '../AppContext'
-import { fetchCoordinates, fetchForecast } from '../api/forecastAPI'
+import { fetchCoordinatesByName, fetchCoordinatesByIp, fetchForecast } from '../api/forecastAPI'
 
 function useForecast() {
   const { setForecast, setLocation, setLoading, setError } = useContext(AppContext)
 
-  function getCoordinates(location) {
-    (async () => {
+  const getCoordinatesByIp = getCoordinates(fetchCoordinatesByIp)
+  const getCoordinatesByName = getCoordinates(fetchCoordinatesByName)
+
+  function getCoordinates(fn) {
+    return async (param) => {
       try {
-        const res = await fetchCoordinates(location)
+        const res = await fn(param)
 
         if (res.status === 200) {
-          const coordinates = res.data[0].coordinates
-          const name = `${res.data[0].name}, ${res.data[0].country.name}`
+          const data = Array.isArray(res.data) ? res.data[0] : res.data
 
-          if (res.data.length === 0) {
-            throw Error("Can't find this location")
+          if (data.length === 0) {
+            setError("Can't find this location")
           } else {
+            const coordinates = data.coordinates
+            const name = `${data.name}, ${data.country.name}`
+
             setLocation({ coordinates, name })
           }
         } else {
@@ -27,19 +32,16 @@ function useForecast() {
           setError('Server response time expired. Try again later')
         }
       }
-    })()
+    }
   }
 
   function getForecast({ coordinates, name }) {
     (async () => {
-      setForecast({})
-      setLoading(true)
-
       try {
         const res = await fetchForecast(coordinates)
 
         if (res.status === 200) {
-          res.data.name = name
+          Object.assign(res.data, { name: name })
           setForecast(res.data)
           setLoading(false)
         } else {
@@ -51,7 +53,7 @@ function useForecast() {
     })()
   }
 
-  return { getCoordinates, getForecast }
+  return { getCoordinatesByIp, getCoordinatesByName, getForecast }
 }
 
 export { useForecast }

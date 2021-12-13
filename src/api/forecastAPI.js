@@ -5,17 +5,16 @@ const SPOTT_API_KEY = process.env.REACT_APP_SPOTT_API_KEY
 const BASE_URL = 'https://api.openweathermap.org/data/2.5/'
 const SPOTT_URL = 'https://spott.p.rapidapi.com/'
 
-async function fetchData(url, options) {
-  return await axios
-    .get(url, options)
+async function fetchData(options) {
+  return await axios(options)
     .then((res) => res)
-    .catch((err) => {
-      if (err.response) return err
-    })
+    .catch((err) => err)
 }
 
 function autocompleteName(cityName) {
-  return fetchData(`${SPOTT_URL}places/autocomplete`, {
+  return fetchData({
+    method: 'get',
+    url: `${SPOTT_URL}places/autocomplete`,
     params: {
       type: 'CITY',
       q: cityName,
@@ -30,8 +29,10 @@ function autocompleteName(cityName) {
   })
 }
 
-function fetchCoordinates(cityName) {
-  return fetchData(`${SPOTT_URL}places`, {
+function fetchCoordinatesByName(cityName) {
+  return fetchData({
+    method: 'get',
+    url: `${SPOTT_URL}places`,
     params: {
       type: 'CITY',
       q: cityName,
@@ -46,12 +47,26 @@ function fetchCoordinates(cityName) {
   })
 }
 
-function fetchForecast(coordinates) {
-  return fetchData(`${BASE_URL}onecall`, {
+function fetchCoordinatesByIp() {
+  return fetchData({
+    method: 'get',
+    url: `${SPOTT_URL}places/ip/me`,
+    headers: {
+      'x-rapidapi-host': 'spott.p.rapidapi.com',
+      'x-rapidapi-key': `${SPOTT_API_KEY}`,
+      'Content-Type': 'application/json'
+    }
+  })
+}
+
+function fetchForecast({ latitude, longitude }) {
+  return fetchData({
+    method: 'get',
+    url: `${BASE_URL}onecall`,
     params: {
       appid: `${WEATHER_API_KEY}`,
-      lat: coordinates.latitude,
-      lon: coordinates.longitude,
+      lat: latitude,
+      lon: longitude,
       exclude: 'minutely,hourly',
       units: 'metric'
     },
@@ -61,4 +76,4 @@ function fetchForecast(coordinates) {
   })
 }
 
-export { fetchForecast, fetchCoordinates, autocompleteName }
+export { fetchForecast, fetchCoordinatesByName, fetchCoordinatesByIp, autocompleteName }

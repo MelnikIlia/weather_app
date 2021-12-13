@@ -1,5 +1,6 @@
 import React, { useState, useEffect, createContext } from 'react'
 import PropTypes from 'prop-types'
+import { isObjectEmpty } from './lib/checkFunctions'
 
 export const AppContext = createContext([{}, () => {}])
 
@@ -10,19 +11,23 @@ export const AppProvider = (props) => {
   const [error, setError] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem(
+    !isObjectEmpty(forecast) && localStorage.setItem(
       'forecastData',
       JSON.stringify({
-        forecast: forecast
-      })
-    )
-    localStorage.setItem(
-      'serviceData',
-      JSON.stringify({
-        location: location
+        forecastStored: forecast
       })
     )
   }, [forecast])
+
+  useEffect(() => {
+    !isObjectEmpty(location) && localStorage.setItem(
+      'serviceData',
+      JSON.stringify({
+        locationStored: location,
+        lastUpdated: (forecast?.current?.dt * 1000)
+      })
+    )
+  }, [location])
 
   return (
     <AppContext.Provider value={{ forecast, setForecast, location, setLocation, isLoading, setLoading, error, setError }}>

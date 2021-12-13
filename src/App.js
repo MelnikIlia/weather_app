@@ -1,39 +1,49 @@
 import React, { useContext, useEffect } from 'react'
-import { usePageVisibility } from 'react-page-visibility'
 import { AppContext } from './AppContext'
+import { useForecast } from './hooks/useForecast'
+import { isObjectEmpty } from './lib/checkFunctions'
 
 import Page from './components/Page/Page'
 
 import './App.css'
-import { useForecast } from './hooks/useForecast'
 
 function App() {
-  const isPageVisible = usePageVisibility()
-  const { location, setForecast } = useContext(AppContext)
-  const { getForecast } = useForecast()
+  const { location, setForecast, setLocation, setLoading } = useContext(AppContext)
+  const { getCoordinatesByIp, getForecast } = useForecast()
+  const { forecastStored } = JSON.parse(localStorage.getItem('forecastData')) || false
+  const { locationStored } = JSON.parse(localStorage.getItem('serviceData')) || false
 
   useEffect(() => {
-    const { location } = JSON.parse(localStorage.getItem('serviceData')) || false
-    const { forecast } = JSON.parse(localStorage.getItem('forecastData')) || false
-    const isLocation = location && Object.keys(location).length > 0
-    const isForecast = forecast && Object.keys(forecast).length > 0
-    const hourInterval = 60 * (60 * 1000)
-
-    if (isForecast) setForecast(forecast)
-
-    setTimeout(function updateForecast() {
-      if (isPageVisible && isLocation) {
+    if (!isObjectEmpty(location)) {
+      if (JSON.stringify(location) !== JSON.stringify(locationStored)) {
+        setForecast({})
+        setLoading(true)
         getForecast(location)
       }
-
-      setTimeout(updateForecast, hourInterval)
-    }, hourInterval)
-  }, [])
+    }
+  }, [location])
 
   useEffect(() => {
-    const isLocation = Object.keys(location).length > 0
-    isLocation && getForecast(location)
-  }, [location])
+    const { lastUpdated } = JSON.parse(localStorage.getItem('serviceData')) || false
+    const now = Date.now()
+    const hourInterval = 60 * (60 * 1000)
+
+    if (lastUpdated && now - lastUpdated > hourInterval) {
+      if (!isObjectEmpty(location)) getForecast(location)
+    } else if (isObjectEmpty(forecastStored)) {
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          getCoordinatesByIp()
+        },
+        (error) => {
+          console.error(error)
+        }
+      )
+    } else {
+      setForecast(forecastStored)
+      !isObjectEmpty(locationStored) && setLocation(locationStored)
+    }
+  }, [])
 
   return (
     <div className="App">

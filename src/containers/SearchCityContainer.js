@@ -16,7 +16,7 @@ const SearchCityContainer = () => {
   const [suggestions, setSuggestions] = useState([])
 
   const { error, setError } = useContext(AppContext)
-  const { getCoordinates } = useForecast()
+  const { getCoordinatesByName } = useForecast()
 
   useEffect(() => {
     if (cityName.length === 0) setSuggestions([])
@@ -51,7 +51,7 @@ const SearchCityContainer = () => {
   const onSubmit = (e) => {
     e.preventDefault()
 
-    !error && getCoordinates(cityName)
+    !error && getCoordinatesByName(cityName)
 
     setCityName('')
   }
@@ -60,5 +60,3 @@ const SearchCityContainer = () => {
 }
 
 export default SearchCityContainer
-
-// location = suggestions.find((item) => item.name.includes(cityName))
