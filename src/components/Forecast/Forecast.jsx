@@ -3,10 +3,10 @@ import PropTypes from 'prop-types'
 import CurrentForecast from '../CurrentForecast/CurrentForecast'
 import DailyForecast from '../DailyForecast/DailyForecast'
 
-const Forecast = ({ forecast, location }) => {
+const Forecast = ({ forecast }) => {
   const currentForecast = {
+    name: forecast.name,
     forecast: forecast.current,
-    name: location.name,
     timezone: forecast.timezone
   }
   const dailyForecast = forecast.daily
@@ -20,8 +20,7 @@ const Forecast = ({ forecast, location }) => {
 }
 
 Forecast.propTypes = {
-  forecast: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired
+  forecast: PropTypes.object.isRequired
 }
 
 export default Forecast

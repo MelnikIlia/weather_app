@@ -5,7 +5,7 @@ import './ShowError.css'
 
 const ShowError = ({ error }) => {
   return (
-    <div className="text-center animate__animated animate__fadeIn">
+    <div className="text-center pb-4 animate__animated animate__fadeIn">
       <span className="show-error">{error}</span>
     </div>
   )
