@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { AppContext } from '../../AppContext'
 
 import SearchCityContainer from '../../containers/SearchCityContainer'
-import Loader from '../../components/Loader/Loader'
-import Error from '../../components/Error/Error'
-import Forecast from '../../components/Forecast/Forecast'
-
 import './Page.css'
+
+const Loader = React.lazy(() => import('../../components/Loader/Loader'))
+const ShowError = React.lazy(() => import('../../components/ShowError/ShowError'))
+const Forecast = React.lazy(() => import('../../components/Forecast/Forecast'))
 
 const Page = () => {
   return (
@@ -14,14 +14,16 @@ const Page = () => {
       <div className="page__container container">
         <SearchCityContainer />
         <AppContext.Consumer>
-          {({ forecast, error, isLoading }) => {
+          {({ forecast, location, error, isLoading }) => {
             const isForecast = Object.keys(forecast).length > 0
 
             return (
               <div className="d-flex flex-column py-5">
-                {isLoading && <Loader />}
-                {error && <Error error={error} />}
-                {isForecast && <Forecast forecast={forecast} />}
+                <Suspense fallback={null}>
+                  {isLoading && <Loader />}
+                  {error && <ShowError error={error} />}
+                  {isForecast && <Forecast forecast={forecast} location={location} />}
+                </Suspense>
               </div>
             )
           }}
