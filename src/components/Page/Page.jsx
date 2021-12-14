@@ -5,13 +5,14 @@ import { isObjectEmpty } from '../../lib/checkFunctions'
 import SearchCityContainer from '../../containers/SearchCityContainer'
 import Loader from '../../components/Loader/Loader'
 import ShowError from '../../components/ShowError/ShowError'
+import ShowMessage from '../ShowMessage/ShowMessage'
 
 import './Page.css'
 
 const Forecast = React.lazy(() => import('../../components/Forecast/Forecast'))
 
 const Page = () => {
-  const { forecast, error, isLoading } = useContext(AppContext)
+  const { forecast, message, error, isLoading } = useContext(AppContext)
 
   return (
     <div className="page">
@@ -21,6 +22,7 @@ const Page = () => {
           <Suspense fallback={null}>
             {isLoading && <Loader />}
             {error && <ShowError error={error} />}
+            {message && <ShowMessage message={message} />}
             {!isObjectEmpty(forecast) && <Forecast forecast={forecast} />}
           </Suspense>
         </div>
