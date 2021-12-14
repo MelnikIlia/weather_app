@@ -8,10 +8,35 @@ import Page from './components/Page/Page'
 import './App.css'
 
 function App() {
-  const { location, setForecast, setLocation, setLoading } = useContext(AppContext)
+  const { location, setLocation, setForecast, setMessage, setLoading } = useContext(AppContext)
   const { getCoordinatesByIp, getForecast } = useForecast()
   const { forecastStored } = JSON.parse(localStorage.getItem('forecastData')) || false
   const { locationStored } = JSON.parse(localStorage.getItem('serviceData')) || false
+
+  useEffect(() => {
+    const { lastUpdated } = JSON.parse(localStorage.getItem('serviceData')) || false
+    const now = Date.now()
+    const hourInterval = 60 * (60 * 1000)
+
+    if (isObjectEmpty(locationStored)) {
+      setMessage('Enable location detection to get the forecast automatically')
+
+      navigator.geolocation.getCurrentPosition(
+        () => {
+          setMessage('')
+          getCoordinatesByIp()
+        },
+        (error) => {
+          console.error(error)
+        }
+      )
+    } else if (lastUpdated && now - lastUpdated > hourInterval) {
+      if (!isObjectEmpty(locationStored)) getForecast(locationStored)
+    } else {
+      setForecast(forecastStored)
+      !isObjectEmpty(locationStored) && setLocation(locationStored)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isObjectEmpty(location)) {
@@ -22,28 +47,6 @@ function App() {
       }
     }
   }, [location])
-
-  useEffect(() => {
-    const { lastUpdated } = JSON.parse(localStorage.getItem('serviceData')) || false
-    const now = Date.now()
-    const hourInterval = 60 * (60 * 1000)
-
-    if (lastUpdated && now - lastUpdated > hourInterval) {
-      if (!isObjectEmpty(location)) getForecast(location)
-    } else if (isObjectEmpty(forecastStored)) {
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          getCoordinatesByIp()
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
-    } else {
-      setForecast(forecastStored)
-      !isObjectEmpty(locationStored) && setLocation(locationStored)
-    }
-  }, [])
 
   return (
     <div className="App">
