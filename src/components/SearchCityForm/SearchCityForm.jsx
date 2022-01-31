@@ -7,13 +7,18 @@ import './SearchCityForm.css'
 
 const SearchCityForm = ({ cityName, setCityName, suggestions, onSubmit }) => {
   return (
-    <form className="form text-center" onSubmit={onSubmit}>
+    <form
+      className="form text-center"
+      onSubmit={onSubmit}
+      name="search-city-form"
+      role="form"
+      aria-label="search city form">
       <div className="search-box">
         <Autocomplete
           value={cityName}
           items={(() => {
-            if (cityName.length > MIN_AMOUNT_CHARS_TO_SEARCH - 1) {
-              return suggestions.sort((a, b) => (a.name > b.name ? 1 : -1))
+            if (cityName?.length > MIN_AMOUNT_CHARS_TO_SEARCH - 1) {
+              return [...suggestions?.sort((a, b) => (a.name > b.name ? 1 : -1))]
             }
             return []
           })()}
@@ -37,10 +42,10 @@ const SearchCityForm = ({ cityName, setCityName, suggestions, onSubmit }) => {
 }
 
 SearchCityForm.propTypes = {
-  cityName: PropTypes.string.isRequired,
-  setCityName: PropTypes.func.isRequired,
-  suggestions: PropTypes.array.isRequired,
-  onSubmit: PropTypes.func.isRequired
+  cityName: PropTypes.string,
+  setCityName: PropTypes.func,
+  suggestions: PropTypes.array,
+  onSubmit: PropTypes.func
 }
 
 export default SearchCityForm

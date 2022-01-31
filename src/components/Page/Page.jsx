@@ -1,5 +1,5 @@
-import React, { Suspense, useContext } from 'react'
-import { AppContext } from '../../AppContext'
+import React, { Suspense } from 'react'
+import { useStore } from '../../store/store'
 import { isObjectEmpty } from '../../lib/checkFunctions'
 
 import SearchCityContainer from '../../containers/SearchCityContainer'
@@ -12,7 +12,8 @@ import './Page.css'
 const Forecast = React.lazy(() => import('../../components/Forecast/Forecast'))
 
 const Page = () => {
-  const { forecast, message, error, isLoading } = useContext(AppContext)
+  const [appState] = useStore()
+  const { forecast, isLoading, message, error } = appState
 
   return (
     <div className="page">

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext } from 'react'
+import React, { useState, useEffect } from 'react'
+import { setError } from '../actions/actions'
+import { useStore } from '../store/store'
 import { useForecast } from '../hooks/useForecast'
-import { AppContext } from '../AppContext'
 import { autocompleteName } from '../api/forecastAPI'
 import { MIN_AMOUNT_CHARS_TO_SEARCH } from '../constants/constants'
 
@@ -12,10 +13,9 @@ const validInput = (value) => {
 }
 
 const SearchCityContainer = () => {
+  const [appState, dispatch] = useStore()
   const [cityName, setCityName] = useState('')
   const [suggestions, setSuggestions] = useState([])
-
-  const { error, setError } = useContext(AppContext)
   const { getCoordinatesByName } = useForecast()
 
   useEffect(() => {
@@ -23,8 +23,8 @@ const SearchCityContainer = () => {
 
     if (cityName.length > 0) {
       validInput(cityName)
-        ? setError(false)
-        : setError('The name of the place must contain only letters and be longer than 3')
+        ? dispatch(setError(false))
+        : dispatch(setError('The name of the city should contain only letters more than 4'))
     }
 
     if (cityName.length === MIN_AMOUNT_CHARS_TO_SEARCH) {
@@ -42,7 +42,7 @@ const SearchCityContainer = () => {
             throw Error(res)
           }
         } catch (err) {
-          if (err.status === 504) setError('Server response time expired. Try again later')
+          if (err.status === 504) dispatch(setError('Server response time expired. Try again later'))
         }
       })()
     }
@@ -51,7 +51,7 @@ const SearchCityContainer = () => {
   const onSubmit = (e) => {
     e.preventDefault()
 
-    !error && getCoordinatesByName(cityName)
+    !appState.error && getCoordinatesByName(cityName)
 
     setCityName('')
   }

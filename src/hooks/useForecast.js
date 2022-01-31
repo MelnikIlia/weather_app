@@ -1,10 +1,9 @@
-import { useContext } from 'react'
-import { AppContext } from '../AppContext'
+import { useStore } from '../store/store'
+import { updateForecast, updateLocation, setLoading, setError } from '../actions/actions'
 import { fetchCoordinatesByName, fetchCoordinatesByIp, fetchForecast } from '../api/forecastAPI'
 
 function useForecast() {
-  const { setForecast, setLocation, setLoading, setError } = useContext(AppContext)
-
+  const [, dispatch] = useStore()
   const getCoordinatesByIp = getCoordinates(fetchCoordinatesByIp)
   const getCoordinatesByName = getCoordinates(fetchCoordinatesByName)
 
@@ -17,19 +16,19 @@ function useForecast() {
           const data = Array.isArray(res.data) ? res.data[0] : res.data
 
           if (data.length === 0) {
-            setError("Can't find this location")
+            dispatch(setError("Can't find this location"))
           } else {
             const coordinates = data.coordinates
             const name = `${data.name}, ${data.country.name}`
 
-            setLocation({ coordinates, name })
+            dispatch(updateLocation({ coordinates, name }))
           }
         } else {
           throw Error(res)
         }
       } catch (err) {
         if (err.status === 504) {
-          setError('Server response time expired. Try again later')
+          dispatch(setError('Server response time expired. Try again later'))
         }
       }
     }
@@ -42,13 +41,16 @@ function useForecast() {
 
         if (res.status === 200) {
           Object.assign(res.data, { name: name })
-          setForecast(res.data)
-          setLoading(false)
+          dispatch(updateForecast(res.data))
+          dispatch(setLoading(false))
         } else {
           throw Error(res)
         }
       } catch (err) {
-        if (err.status === 504) setError('Server response time expired. Try again later')
+        if (err.status === 504) dispatch(setError('Server response time expired. Try again later'))
+        if (err.status >= 400 && err.status < 500) {
+          dispatch(setError('The name of the place was entered incorrectly. Try again'))
+        }
       }
     })()
   }

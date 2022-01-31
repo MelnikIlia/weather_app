@@ -1,5 +1,6 @@
-import React, { useContext, useEffect } from 'react'
-import { AppContext } from './AppContext'
+import React, { useEffect } from 'react'
+import { useStore } from './store/store'
+import { updateForecast, updateLocation, setMessage, setLoading } from './actions/actions'
 import { useForecast } from './hooks/useForecast'
 import { isObjectEmpty } from './lib/checkFunctions'
 
@@ -8,7 +9,7 @@ import Page from './components/Page/Page'
 import './App.css'
 
 function App() {
-  const { location, setLocation, setForecast, setMessage, setLoading } = useContext(AppContext)
+  const [appState, dispatch] = useStore()
   const { getCoordinatesByIp, getForecast } = useForecast()
   const { forecastStored } = JSON.parse(localStorage.getItem('forecastData')) || false
   const { locationStored } = JSON.parse(localStorage.getItem('serviceData')) || false
@@ -19,11 +20,11 @@ function App() {
     const hourInterval = 60 * (60 * 1000)
 
     if (isObjectEmpty(locationStored)) {
-      setMessage('Enable location detection to get the forecast automatically')
+      dispatch(setMessage('Enable location detection to get the forecast automatically'))
 
       navigator.geolocation.getCurrentPosition(
         () => {
-          setMessage('')
+          dispatch(setMessage(''))
           getCoordinatesByIp()
         },
         (error) => {
@@ -33,20 +34,20 @@ function App() {
     } else if (lastUpdated && now - lastUpdated > hourInterval) {
       if (!isObjectEmpty(locationStored)) getForecast(locationStored)
     } else {
-      setForecast(forecastStored)
-      !isObjectEmpty(locationStored) && setLocation(locationStored)
+      !isObjectEmpty(forecastStored) && dispatch(updateForecast(forecastStored))
+      !isObjectEmpty(locationStored) && dispatch(updateLocation(locationStored))
     }
   }, [])
 
   useEffect(() => {
-    if (!isObjectEmpty(location)) {
-      if (JSON.stringify(location) !== JSON.stringify(locationStored)) {
-        setForecast({})
-        setLoading(true)
-        getForecast(location)
+    if (!isObjectEmpty(appState.location)) {
+      if (JSON.stringify(appState.location) !== JSON.stringify(locationStored)) {
+        dispatch(updateForecast({}))
+        dispatch(setLoading(true))
+        getForecast(appState.location)
       }
     }
-  }, [location])
+  }, [appState.location])
 
   return (
     <div className="App">
