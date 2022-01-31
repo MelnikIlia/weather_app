@@ -33,8 +33,8 @@ const SearchCityForm = ({ cityName, setCityName, suggestions, onSubmit }) => {
           onSelect={(value) => setCityName(value)}
           inputProps={{ placeholder: 'Search city' }}
         />
-        <button className="form__button" type="submit">
-          <img src="icons/search.svg" />
+        <button className="form__button" type="submit" role="search">
+          <img src="icons/search.svg" role="search" />
         </button>
       </div>
     </form>
