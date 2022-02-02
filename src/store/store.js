@@ -26,9 +26,6 @@ export const AppProvider = (props) => {
           forecastStored: appState.forecast
         })
       )
-  }, [appState.forecast])
-
-  useEffect(() => {
     !isObjectEmpty(appState.location) &&
       localStorage.setItem(
         'serviceData',
@@ -37,7 +34,7 @@ export const AppProvider = (props) => {
           lastUpdated: appState.forecast?.current?.dt * 1000
         })
       )
-  }, [appState.location])
+  }, [appState.forecast, appState.location])
 
   return <AppContext.Provider value={[appState, dispatch]}>{props.children}</AppContext.Provider>
 }

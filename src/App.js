@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { useStore } from './store/store'
-import { updateForecast, updateLocation, setMessage, setLoading } from './actions/actions'
+import { updateForecast, updateLocation, setLoading } from './actions/actions'
 import { useForecast } from './hooks/useForecast'
 import { isObjectEmpty } from './lib/checkFunctions'
 
@@ -10,7 +10,7 @@ import './App.css'
 
 function App() {
   const [appState, dispatch] = useStore()
-  const { getCoordinatesByIp, getForecast } = useForecast()
+  const { getForecast } = useForecast()
   const { forecastStored } = JSON.parse(localStorage.getItem('forecastData')) || false
   const { locationStored } = JSON.parse(localStorage.getItem('serviceData')) || false
 
@@ -19,19 +19,7 @@ function App() {
     const now = Date.now()
     const hourInterval = 60 * (60 * 1000)
 
-    if (isObjectEmpty(locationStored)) {
-      dispatch(setMessage('Enable location detection to get the forecast automatically'))
-
-      navigator.geolocation.getCurrentPosition(
-        () => {
-          dispatch(setMessage(''))
-          getCoordinatesByIp()
-        },
-        (error) => {
-          console.error(error)
-        }
-      )
-    } else if (lastUpdated && now - lastUpdated > hourInterval) {
+    if (lastUpdated && now - lastUpdated > hourInterval) {
       if (!isObjectEmpty(locationStored)) getForecast(locationStored)
     } else {
       !isObjectEmpty(forecastStored) && dispatch(updateForecast(forecastStored))

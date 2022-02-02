@@ -15,3 +15,7 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.btn-rounded {
+  border-radius: 3rem;
+}
